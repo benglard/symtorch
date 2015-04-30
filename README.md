@@ -1,6 +1,6 @@
 # symtorch
 
-I prefer [torch7](https://github.com/torch/torch7) over similar projects for almost everything, but sometimes miss [theano](https://github.com/theano/theano)'s expressiveness, especially when constructing complex models like RNN's with LSTM units. symtorch brings expressive and trainable graph computation to torch. symtorch doesn't copy theano's symbolic tensors/computations because I'm not a huge fan of that.
+I prefer [torch7](https://github.com/torch/torch7) over similar libraries for almost everything, but sometimes miss [theano](https://github.com/theano/theano)'s expressiveness, especially when constructing complex models like RNN's with LSTM units. symtorch brings expressive and trainable graph computation to torch. symtorch doesn't copy theano's symbolic tensors/computations because I'm not a huge fan of that.
 
 Yes, I know [torch/nngraph](https://github.com/torch/nngraph) exists, but I think comparing LSTM examples in nngraph and symtorch will illustrate why I like symtorch.
 
@@ -81,7 +81,7 @@ This is still a work in progress, thus thoughts, feedback, and contributions are
 ## Installation
 
 ```
-> (sudo) luarocks install https://github.com/benglard/luaclass/blob/master/luaclass-scm-1.rockspec
-> (sudo) luarocks install https://github.com/benglard/luaimport/blob/master/luaimport-scm-1.rockspec
-> (sudo) luarocks install https://github.com/benglard/symtorch/blob/master/symtorch-scm-1.rockspec
+> (sudo) luarocks install https://raw.githubusercontent.com/benglard/luaclass/master/luaclass-scm-1.rockspec
+> (sudo) luarocks install https://raw.githubusercontent.com/benglard/luaimport/master/luaimport-scm-1.rockspec
+> (sudo) luarocks install https://raw.githubusercontent.com/benglard/symtorch/master/symtorch-scm-1.rockspec
 ```
