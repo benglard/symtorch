@@ -4,8 +4,7 @@ require 'luaimport'
 
 local path = debug.getinfo(1).source:sub(2)
 symtorch = { cpath = paths.concat(path:match('(.*/)'), 'libsymtorch.o') }
-package 'symtorch'
-import {
+symtorch = Package {
    'graph',
    'tensor',
    'ops',
