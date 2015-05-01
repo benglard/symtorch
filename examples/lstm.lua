@@ -47,7 +47,6 @@ local LSTM = Class {
          return h_t, c_t
       end
 
-      local mem = symtorch.Tensor(self.hidden_size, 1)
       local res = symtorch.scan{
          fn = step,
          sequences = {input, self.prev_h, self.prev_c}
