@@ -1,3 +1,13 @@
+local elemApply = function(elem, cb1, cb2, ...)
+   if elem.name == 'Tensor' then
+      return cb1(elem, ...)
+   elseif type(elem) == 'table' then
+      return cb2(elem, ...)
+   else
+      assert(false, 'sequence must be of type symtorch.Tensor or lua table')
+   end
+end
+
 local _scan = function(options)
    options = options or {}
    local fn = options.fn or function(...) end
@@ -6,34 +16,25 @@ local _scan = function(options)
    local nonseqs = options.nonsequences or {}
    local nsteps = options.nsteps or nil
 
-   if nsteps == nil then
-      nsteps = seqs[1].w:size(1)
-      for i = 2, #seqs do
-         local size
-         if seqs[i].name == 'Tensor' then
-            size = seqs[i].w:size(1)
-         elseif type(seqs[i]) == 'table' then
-            size = #seqs[i]
-         else
-            assert(false, 'sequence must be of type symtorch.Tensor or lua table')
-         end
+   local tensorSize = function(e) return e.w:size(1) end
+   local tableSize = function(e) return #e end
 
+   if nsteps == nil then
+      nsteps = elemApply(seqs[1], tensorSize, tableSize)
+      for i = 2, #seqs do
+         local size = elemApply(seqs[i], tensorSize, tableSize)
          if nsteps > size then
             nsteps = size
          end
       end
    end
 
+   local identity = function(e) return e end
+   local getElem = function(e, ...) return e[...] end
    local function getinputs(i, src, dest)
-      for i = 1, #src do
-         local elem = src[i]
-         if elem.name == 'Tensor' then
-            table.insert(dest, elem)
-         elseif type(elem) == 'table' then
-            table.insert(dest, elem[i])
-         else
-            assert(false, 'sequence must be of type symtorch.Tensor or lua table')
-         end
+      for j = 1, #src do
+         local elem = src[j]
+         table.insert(dest, elemApply(elem, identity, getElem, i))
       end
    end
 
