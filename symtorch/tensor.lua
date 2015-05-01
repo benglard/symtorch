@@ -1,5 +1,7 @@
 return {
    Tensor = Class {
+      name = 'Tensor',
+
       __init__ = function(self, ...)
          self.w = torch.zeros(...)
          self.dw = torch.zeros(...)

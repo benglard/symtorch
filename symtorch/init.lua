@@ -9,7 +9,9 @@ symtorch = Package {
    'tensor',
    'ops',
    'conv',
-   'random'
+   'random',
+   'scan',
+   'update'
 }
 _graph = symtorch.Graph()
 return symtorch

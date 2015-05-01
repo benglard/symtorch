@@ -82,78 +82,10 @@ local _softmax = function(input)
    return output
 end
 
-local _scan = function(options)
-   options = options or {}
-   local fn = options.fn or function(...) end
-   local seqs = options.sequences or {}
-   local nsteps = options.nsteps or nil
-
-   if nsteps == nil then
-      nsteps = seqs[1].w:size(1)
-      for i = 2, #seqs do
-         local size = seqs[i].w:size(1)
-         if nsteps > size then
-            nsteps = size
-         end
-      end
-   end
-
-   local rv = {}
-   for i = 1, nsteps do
-      table.insert(rv, {fn(unpack(seqs))})
-      seqs = rv[#rv]
-   end
-   return rv
-end
-
-local _update = Class { -- rmsprop by default
-   __init__ = function(self)
-      self.decayRate = 0.999
-      self.epsilon = 1e-8
-      self.stepCache = {}
-   end,
-
-   __call = function(self, params, lr, reg, clip)
-      _graph:backward()
-
-      lr = lr or 0.01
-      reg = reg or 0.0001
-      clip = clip or 5
-
-      for i = 1, #params do
-         local p = params[i]
-         if self.stepCache[i] == nil then
-            self.stepCache[i] = symtorch.Tensor(p.w:size())
-         end
-         local s = self.stepCache[i]
-
-         -- clip gradients
-         p.dw:apply(function(elem)
-            if elem > clip then return clip
-            elseif elem < -clip then return -clip
-            else return elem end
-         end)
-
-         -- update cache
-         s.w:mul(self.decayRate)
-            :add(torch.cmul(p.dw, p.dw):mul(1 - self.decayRate))
-
-         -- update params
-         local delta = torch.mul(p.dw, -lr)
-                        :cdiv(torch.add(s.w, self.epsilon):sqrt())
-                        :add(torch.mul(p.w, -reg))
-         p.w:add(delta)
-         p.dw:zero()
-      end
-   end,
-}
-
 return {
    tanh = _tanh,
    relu = _relu,
    sigmoid = _sigmoid,
    exp = _exp,
-   softmax = _softmax,
-   scan = _scan,
-   update = _update()
+   softmax = _softmax
 }
