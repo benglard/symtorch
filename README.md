@@ -87,7 +87,7 @@ local LSTM = Class {
 }
 ```
 
-This is still a work in progress, thus thoughts, feedback, and contributions are very welcome! I think the code should be more self-explanatory than the giant and impressive compiler theano. Convolutions, max pooling, and some other operations are written in C and called via LuaJIT FFI. I am currently writing a neural network library on top of symtorch, expect it to be similar to [benglard/Inveling/nn](https://github.com/benglard/Inveling/tree/master/nn) or [fchollet/keras](https://github.com/fchollet/keras).
+This is still a work in progress, thus thoughts, feedback, and contributions are very welcome! I think the code should be more self-explanatory than the giant and impressive compiler theano. Convolutions, max pooling, and some other operations are written in C and called via LuaJIT FFI. I am currently writing a neural network library on top of symtorch, [symnn](https://github.com/benglard/symnn).
 
 ## Installation
 

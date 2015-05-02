@@ -29,14 +29,14 @@ void tensor_relu(double* tensor, unsigned int size) {
 }
 
 void tensor_relu_backward(
-  double* input_w,
   double* input_dw,
+  double* output_w,
   double* output_dw,
   unsigned int size
 ) {
   int i = 0;
   for(; i < size; i++) {
-    input_dw[i] += input_w[i] > 0 ? output_dw[i] : 0.0;
+    input_dw[i] += output_w[i] <= 0.0 ? 0.0 : output_dw[i];
   }
 }
 

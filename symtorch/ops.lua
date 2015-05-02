@@ -11,8 +11,8 @@ void tensor_sigmoid_backward(
 
 void tensor_relu(double* tensor, int size);
 void tensor_relu_backward(
-  double* input_w,
   double* input_dw,
+  double* output_w,
   double* output_dw,
   unsigned int size
 );
@@ -38,8 +38,8 @@ local _relu = function(input)
    
    _graph:add(function()
       libsymtorch.tensor_relu_backward(
-         input.w:data(),
          input.dw:data(),
+         output.w:data(),
          output.dw:data(),
          output.w:nElement()
       )
