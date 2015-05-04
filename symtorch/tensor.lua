@@ -44,6 +44,17 @@ return {
          return self
       end,
 
+      fill = function(self, val)
+         self.w:fill(val)
+         return self
+      end,
+
+      copy = function(self, w, dw)
+         if w ~= nil then self.w:resizeAs(w):copy(w) end
+         if dw ~= nil then self.dw:resizeAs(dw):copy(dw) end
+         return self
+      end,
+
       __add = function(self, other) -- element wise
          local output = self:clone()         
          output.w:add(other.w)
