@@ -3,8 +3,8 @@ return {
       name = 'Tensor',
 
       __init__ = function(self, ...)
-         self.w = torch.zeros(...)
-         self.dw = torch.zeros(...)
+         self.w = torch.Tensor(...):fill(0)
+         self.dw = torch.Tensor(...):fill(0)
       end,
 
       __index = function(self, key)
@@ -27,8 +27,7 @@ return {
       end,
 
       clone = function(self)
-         local rv = {}
-         setmetatable(rv, getmetatable(self))
+         local rv = setmetatable({}, getmetatable(self))
          for key, val in pairs(self) do
             if torch.type(val) == 'torch.DoubleTensor' then
                rv[key] = val:clone()
@@ -60,12 +59,12 @@ return {
 
       __mul = function(self, other) -- element wise
          local output = self:clone()
-         output.w:cmul(self.w, other.w)
+         output.w:cmul(other.w)
          output.dw:resizeAs(output.w)
       
          _graph:add(function()
-            self.dw:add(torch.cmul(other.w, output.dw))
-            other.dw:add(torch.cmul(self.w, output.dw))
+            self.dw:addcmul(other.w, output.dw)
+            other.dw:addcmul(self.w, output.dw)
          end)
 
          return output
