@@ -87,8 +87,17 @@ return {
          output.dw:resizeAs(output.w)
 
          _graph:add(function()
-            self.dw:add(other.w * output.dw:t())
-            other.dw:add(self.w:t() * output.dw)
+            local nDim = output.w:dim()
+            if nDim == 1 then
+               self.dw:addr(output.dw, other.w)
+               other.dw:addmv(self.dw:t(), output.w)
+            elseif nDim == 2 then
+               self.dw:addmm(output.dw, other.w:t())
+               other.dw:addmm(self.w:t(), output.dw)
+            elseif nDim == 3 then
+               self.dw:addbmm(other.w, output.dw:transpose(2, 3))
+               other.dw:addbmm(self.w:transpose(2, 3) * output.dw)
+            end
          end)
 
          return output
