@@ -13,7 +13,7 @@ return {
 
       rand = function(self, mu, std)
          mu = mu or 0
-         std = std or 1.0/math.sqrt(self.w:nElement())
+         std = std or 1.0/math.sqrt(self.w:size(self.w:dim()))
          self.w:apply(function() return torch.normal(mu, std) end)
          return self
       end,
@@ -89,11 +89,11 @@ return {
          _graph:add(function()
             local nDim = output.w:dim()
             if nDim == 1 then
-               self.dw:addr(output.dw, other.w)
-               other.dw:addmv(self.dw:t(), output.w)
+               self.dw:addr(0, 1, output.dw, other.w)
+               other.dw:addmv(0, 1, self.dw:t(), output.w)
             elseif nDim == 2 then
-               self.dw:addmm(output.dw, other.w:t())
-               other.dw:addmm(self.w:t(), output.dw)
+               self.dw:addmm(0, 1, output.dw, other.w:t())
+               other.dw:addmm(0, 1, self.w:t(), output.dw)
             elseif nDim == 3 then
                self.dw:addbmm(other.w, output.dw:transpose(2, 3))
                other.dw:addbmm(self.w:transpose(2, 3) * output.dw)
