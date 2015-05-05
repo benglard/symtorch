@@ -84,7 +84,7 @@ local _exp = function(input)
 end
 
 local _log = function(input)
-   local output = self:clone()
+   local output = input:clone()
    output.w:log()
 
    _graph:add(function()
