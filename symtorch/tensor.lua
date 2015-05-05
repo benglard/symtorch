@@ -13,7 +13,7 @@ return {
 
       rand = function(self, mu, std)
          mu = mu or 0
-         std = std or 1.0/math.sqrt(self.w:size(self.w:dim()))
+         std = std or math.sqrt(1.0/self.w:nElement())
          self.w:apply(function() return torch.normal(mu, std) end)
          return self
       end,
