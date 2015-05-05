@@ -53,6 +53,7 @@ o.dw[argmax] = 1.0
 print('Bias before update')
 print(fc_b.w)
 local params = {conv1_W, conv1_b_real, conv2_W, conv2_b_real, fc_W, fc_b}
+_graph:backward()
 symtorch.update(params)
 print('Bias after update')
 print(fc_b.w)

@@ -11,6 +11,7 @@ out.dw[1] = 1.0
 print('Bias before update')
 print(b.w)
 local params = {W, b}
+_graph:backward()
 symtorch.update(params)
 print('Bias after update')
 print(b.w)
@@ -20,6 +21,7 @@ print(out.w)
 out.dw[2] = 1.0
 print('Bias before update')
 print(b.w)
+_graph:backward()
 symtorch.update(params)
 print('Bias after update')
 print(b.w)

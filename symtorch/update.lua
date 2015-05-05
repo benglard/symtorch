@@ -7,12 +7,6 @@ local _update = Class { -- rmsprop by default
    clip = 5,
 
    __call = function(self, params, lr, reg, clip)
-      _graph:backward()
-
-      self.lr = lr or self.lr
-      self.reg = reg or self.reg
-      self.clip = clip or self.clip
-
       for i = 1, #params do
          local p = params[i]
          if self.stepCache[i] == nil then

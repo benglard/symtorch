@@ -1,6 +1,13 @@
 local ffi = require 'ffi'
 local libsymtorch = ffi.load(symtorch.cpath)
 ffi.cdef[[ 
+void tensor_tanh_backward(
+  double* input_dw,
+  double* output_w,
+  double* output_dw,
+  unsigned int size
+);
+
 void tensor_sigmoid(double* tensor, int size);
 void tensor_sigmoid_backward(
   double* input_dw,
@@ -23,10 +30,11 @@ local _tanh = function(input)
    output.w:tanh()
 
    _graph:add(function()
-      local ow2 = torch.cmul(output.w, output.w)
-      local delta = torch.ones(ow2:size()) - ow2
-      delta:cmul(output.dw)
-      input.dw:add(delta)
+      libsymtorch.tensor_tanh_backward(
+         input.dw:data(),
+         output.w:data(),
+         output.dw:data(),
+         output.w:nElement())
    end)
 
    return output
@@ -69,7 +77,18 @@ local _exp = function(input)
    output.w:exp()
 
    _graph:add(function()
-      input.dw:cmul(output.dw)
+      input.dw:addcmul(output.w, output.dw)
+   end)
+
+   return output
+end
+
+local _log = function(input)
+   local output = self:clone()
+   output.w:log()
+
+   _graph:add(function()
+      input.dw:addcdiv(torch.ones(output.w:size()), output.dw)
    end)
 
    return output
@@ -87,5 +106,6 @@ return {
    relu = _relu,
    sigmoid = _sigmoid,
    exp = _exp,
+   log = _log,
    softmax = _softmax
 }

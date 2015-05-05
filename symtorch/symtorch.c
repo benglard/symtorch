@@ -1,5 +1,19 @@
 #include <math.h>
 
+void tensor_tanh_backward(
+  double* input_dw,
+  double* output_w,
+  double* output_dw,
+  unsigned int size
+) {
+  int i = 0;
+  double ow = 0.0;
+  for(; i < size; i++) {
+    ow = output_w[i];
+    input_dw[i] += (1.0 - ow * ow) * output_dw[i];
+  }
+}
+
 void tensor_sigmoid(double* tensor, unsigned int size) {
   int i = 0;
   for(; i < size; i++) {

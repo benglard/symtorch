@@ -3,8 +3,8 @@ return {
       name = 'Tensor',
 
       __init__ = function(self, ...)
-         self.w = torch.Tensor(...):fill(0)
-         self.dw = torch.Tensor(...):fill(0)
+         self.w = torch.DoubleTensor(...):fill(0)
+         self.dw = torch.DoubleTensor(...):fill(0)
       end,
 
       __index = function(self, key)
