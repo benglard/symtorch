@@ -105,7 +105,6 @@ local _conv2 = function(input, filter, stride, pad)
       sx, sy, stride, pad)
 
    _graph:add(function()
-      input.dw:zero()
       libsymtorch.tensor_conv2d_backward(
          input.w:data(), input.dw:data(),
          output.w:data(), output.dw:data(),
@@ -153,7 +152,6 @@ local _pool = function(input, sx, sy, stride, pad)
       sx, sy, stride, pad)
 
    _graph:add(function()
-      input.dw:zero()
       libsymtorch.tensor_maxpool2d_backward(
          input.w:data(), input.dw:data(),
          output.w:data(), output.dw:data(),

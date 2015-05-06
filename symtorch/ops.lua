@@ -28,9 +28,9 @@ void tensor_relu_backward(
 local _tanh = function(input)
    local output = input:clone()
    output.w:tanh()
+   output.dw:zero()
 
    _graph:add(function()
-      input.dw:zero()
       libsymtorch.tensor_tanh_backward(
          input.dw:data(),
          output.w:data(),
@@ -44,9 +44,9 @@ end
 local _relu = function(input)
    local output = input:clone()
    libsymtorch.tensor_relu(output.w:data(), output.w:nElement())
+   output.dw:zero()
    
    _graph:add(function()
-      input.dw:zero()
       libsymtorch.tensor_relu_backward(
          input.dw:data(),
          output.w:data(),
@@ -61,9 +61,9 @@ end
 local _sigmoid = function(input)
    local output = input:clone()
    libsymtorch.tensor_sigmoid(output.w:data(), output.w:nElement())
+   output.dw:zero()
    
    _graph:add(function()
-      input.dw:zero()
       libsymtorch.tensor_sigmoid_backward(
          input.dw:data(),
          output.w:data(),
@@ -78,6 +78,7 @@ end
 local _exp = function(input)
    local output = input:clone()
    output.w:exp()
+   output.dw:zero()
 
    _graph:add(function()
       input.dw:addcmul(output.w, output.dw)
@@ -89,6 +90,7 @@ end
 local _log = function(input)
    local output = input:clone()
    output.w:log()
+   output.dw:zero()
 
    _graph:add(function()
       input.dw:addcdiv(torch.ones(output.w:size()), output.dw)
@@ -101,6 +103,7 @@ local _softmax = function(input)
    local output = input:clone()
    local max = output.w:max()
    output.w:add(-max):exp():div(output.w:sum())
+   output.dw:zero()
    return output
 end
 

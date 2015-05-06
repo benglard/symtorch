@@ -6,7 +6,7 @@ local _update = Class { -- rmsprop by default
    reg = 0.0001,
    clip = 5,
 
-   __call = function(self, params, lr, reg, clip)
+   __call = function(self, params)
       for i = 1, #params do
          local p = params[i]
          if self.stepCache[i] == nil then

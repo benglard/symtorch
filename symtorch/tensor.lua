@@ -56,43 +56,43 @@ return {
       end,
 
       __add = function(self, other) -- element wise
-         local output = self:clone()         
-         output.w:add(other.w)
-         output.dw:resizeAs(output.w)
+         local output = symtorch.Tensor()
+         output.w:add(self.w, other.w)
+         output.dw:resizeAs(output.w):zero()
 
          _graph:add(function()
-            self.dw:zero():add(output.dw)
-            other.dw:zero():add(output.dw)
+            self.dw:add(output.dw)
+            other.dw:add(output.dw)
          end)
 
          return output
       end,
 
       __mul = function(self, other) -- element wise
-         local output = self:clone()
-         output.w:cmul(other.w)
-         output.dw:resizeAs(output.w)
+         local output = symtorch.Tensor()
+         output.w:cmul(self.w, other.w)
+         output.dw:resizeAs(output.w):zero()
       
          _graph:add(function()
-            self.dw:zero():addcmul(other.w, output.dw)
-            other.dw:zero():addcmul(self.w, output.dw)
+            self.dw:addcmul(other.w, output.dw)
+            other.dw:addcmul(self.w, output.dw)
          end)
 
          return output
       end,
 
       dot = function(self, other) -- matrix multiply
-         local output = self:clone()
+         local output = symtorch.Tensor()
          output.w = self.w * other.w
-         output.dw:resizeAs(output.w)
+         output.dw:resizeAs(output.w):zero()
 
          _graph:add(function()
-            self.dw:zero()
-            other.dw:zero()
-
             local nDim = output.w:dim()
             if nDim == 1 then
-               self.dw:addr(0, 1, output.dw, other.w)
+               local delta = torch.Tensor(output.dw:size(1), other.w:size(1))
+               delta:addr(0, 1, output.dw, other.w)
+               self.dw:add(delta)
+               --self.dw:addr(0, 1, output.dw, other.w)
                other.dw:addmv(0, 1, self.dw:t(), output.w)
             elseif nDim == 2 then
                self.dw:addmm(0, 1, output.dw, other.w:t())
