@@ -16,7 +16,7 @@ return {
          for i = #self.backprop, 1, -1 do
             self.backprop[i]()
          end
-         --self.backprop = {}
+         self.backprop = {}
       end
    }
 }
