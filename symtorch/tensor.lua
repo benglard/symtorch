@@ -61,8 +61,8 @@ return {
          output.dw:resizeAs(output.w)
 
          _graph:add(function()
-            self.dw:add(output.dw)
-            other.dw:add(output.dw)
+            self.dw:zero():add(output.dw)
+            other.dw:zero():add(output.dw)
          end)
 
          return output
@@ -74,8 +74,8 @@ return {
          output.dw:resizeAs(output.w)
       
          _graph:add(function()
-            self.dw:addcmul(other.w, output.dw)
-            other.dw:addcmul(self.w, output.dw)
+            self.dw:zero():addcmul(other.w, output.dw)
+            other.dw:zero():addcmul(self.w, output.dw)
          end)
 
          return output
@@ -87,6 +87,9 @@ return {
          output.dw:resizeAs(output.w)
 
          _graph:add(function()
+            self.dw:zero()
+            other.dw:zero()
+
             local nDim = output.w:dim()
             if nDim == 1 then
                self.dw:addr(0, 1, output.dw, other.w)

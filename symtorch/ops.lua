@@ -30,6 +30,7 @@ local _tanh = function(input)
    output.w:tanh()
 
    _graph:add(function()
+      input.dw:zero()
       libsymtorch.tensor_tanh_backward(
          input.dw:data(),
          output.w:data(),
@@ -45,6 +46,7 @@ local _relu = function(input)
    libsymtorch.tensor_relu(output.w:data(), output.w:nElement())
    
    _graph:add(function()
+      input.dw:zero()
       libsymtorch.tensor_relu_backward(
          input.dw:data(),
          output.w:data(),
@@ -61,6 +63,7 @@ local _sigmoid = function(input)
    libsymtorch.tensor_sigmoid(output.w:data(), output.w:nElement())
    
    _graph:add(function()
+      input.dw:zero()
       libsymtorch.tensor_sigmoid_backward(
          input.dw:data(),
          output.w:data(),
