@@ -19,8 +19,6 @@ return {
       end,
 
       copy = function(self, other)
-         other.w:resizeAs(self.w)
-         other.dw:resizeAs(self.dw)
          self.w:copy(other.w)
          self.dw:copy(other.dw)
          return self
