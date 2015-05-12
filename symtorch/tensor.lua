@@ -19,8 +19,12 @@ return {
       end,
 
       copy = function(self, other)
-         self.w:copy(other.w)
-         self.dw:copy(other.dw)
+         if other:isTensor() then
+            self.w:copy(other)
+         else
+            self.w:copy(other.w)
+            self.dw:copy(other.dw)
+         end
          return self
       end,
 
@@ -44,12 +48,6 @@ return {
 
       fill = function(self, val)
          self.w:fill(val)
-         return self
-      end,
-
-      copy = function(self, w, dw)
-         if w ~= nil then self.w:resizeAs(w):copy(w) end
-         if dw ~= nil then self.dw:resizeAs(dw):copy(dw) end
          return self
       end,
 
