@@ -14,6 +14,10 @@ local _update = Class { -- rmsprop by default
          end
          local s = self.stepCache[i]
 
+         -- update cache
+         s.w:mul(self.decayRate)
+            :add(torch.cmul(p.dw, p.dw):mul(1 - self.decayRate))
+
          -- clip gradients
          p.dw:apply(function(elem)
             if elem > self.clip then return self.clip
@@ -21,15 +25,12 @@ local _update = Class { -- rmsprop by default
             else return elem end
          end)
 
-         -- update cache
-         s.w:mul(self.decayRate)
-            :add(torch.cmul(p.dw, p.dw):mul(1 - self.decayRate))
-
          -- update params
-         local delta = torch.mul(p.dw, -self.lr)
-                        :cdiv(torch.add(s.w, self.epsilon):sqrt())
-                        :add(torch.mul(p.w, -self.reg))
-         p.w:add(delta)
+         s.dw
+            :mul(p.dw, -self.lr)
+            :cdiv(torch.add(s.w, self.epsilon):sqrt())
+            :add(torch.mul(p.w, -self.reg))
+         p.w:add(s.dw)
          p.dw:zero()
       end
    end,

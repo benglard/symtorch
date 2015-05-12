@@ -92,7 +92,6 @@ return {
                local delta = torch.Tensor(output.dw:size(1), other.w:size(1))
                delta:addr(0, 1, output.dw, other.w)
                self.dw:add(delta)
-               --self.dw:addr(0, 1, output.dw, other.w)
                other.dw:addmv(0, 1, self.dw:t(), output.w)
             elseif nDim == 2 then
                self.dw:addmm(0, 1, output.dw, other.w:t())
