@@ -51,6 +51,15 @@ return {
          return self
       end,
 
+      resizeAs = function(self, other)
+         self.w:resizeAs(other.w)
+         self.dw:resizeAs(other.dw)
+      end,
+
+      size = function(self, ...)
+         return self.w:size(...)
+      end,
+
       __add = function(self, other) -- element wise
          local output = symtorch.Tensor()
          output.w:add(self.w, other.w)
@@ -99,6 +108,23 @@ return {
          end)
 
          return output
-      end
+      end,
+
+      depthAdd = function(self, other) -- add along depth
+         local safe = symtorch.Tensor(self:size())
+         local depth = other:size(1)
+         for d = 1, depth do
+            safe[d]:fill(other[d])
+         end
+
+         _graph:add(function()
+            for d = 1, depth do
+               grad = safe.dw[d]:sum()
+               other.dw[d] = other.dw[d] + grad
+            end
+         end)
+
+         return self + safe
+      end,
    }
 }
