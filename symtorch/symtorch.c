@@ -87,8 +87,8 @@ void tensor_conv2d(
             off_x = x + fx;
             if (off_y >= 0 && off_y < in_sy &&
                 off_x >= 0 && off_x < in_sx) {
-              for(fd=0; fd < out_depth; fd++) {
-                idx1 = ((fsx * fy) + fx) * out_depth + fd;
+              for(fd=0; fd < in_depth; fd++) {
+                idx1 = ((fsx * fy) + fx) * in_depth + fd;
                 idx2 = ((in_sx * off_y) + off_x) * in_depth + fd;
                 sum += filter[idx1] * input[idx2];
               }
@@ -139,9 +139,9 @@ void tensor_conv2d_backward(
             off_x = x + fx;
             if (off_y >= 0 && off_y < in_sy &&
                 off_x >= 0 && off_x < in_sx) {
-              for(fd=0; fd < out_depth; fd++) {
+              for(fd=0; fd < in_depth; fd++) {
                 idx1 = ((in_sx * off_y) + off_x) * in_depth + fd;
-                idx2 = ((fsx * fy) + fx) * out_depth + fd;
+                idx2 = ((fsx * fy) + fx) * in_depth + fd;
                 filter_dw[idx2] += input_w[idx1] * grad;
                 input_dw[idx1] += filter_w[idx2] * grad;
               }

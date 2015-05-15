@@ -94,7 +94,7 @@ return {
                other.dw:addmm(0, 1, self.w:t(), output.dw)
             elseif nDim == 3 then
                self.dw:addbmm(other.w, output.dw:transpose(2, 3))
-               other.dw:addbmm(self.w:transpose(2, 3) * output.dw)
+               other.dw:addbmm(self.w:transpose(2, 3), output.dw)
             end
          end)
 
