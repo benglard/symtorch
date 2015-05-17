@@ -119,7 +119,7 @@ return {
 
          _graph:add(function()
             for d = 1, depth do
-               grad = safe.dw[d]:sum()
+               local grad = safe.dw[d]:sum()
                other.dw[d] = other.dw[d] + grad
             end
          end)
