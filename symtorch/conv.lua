@@ -2,78 +2,81 @@ local ffi = require 'ffi'
 local libsymtorch = ffi.load(symtorch.cpath)
 ffi.cdef[[
 void tensor_conv2d(
-  double* input,
+  const double* input,
   double* output,
-  double* filter,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const double* filter,
+  const bool use_bias,
+  const double* bias,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 );
-
 void tensor_conv2d_backward(
-  double* input_w,
+  const double* input_w,
   double* input_dw,
-  double* output_w,
+  const double* output_w,
   double* output_dw,
-  double* filter_w,
+  const double* filter_w,
   double* filter_dw,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const bool use_bias,
+  double* bias_dw,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 );
 
 void tensor_maxpool2d(
-  double* input,
+  const double* input,
   double* output,
   double* x_windows,
   double* y_windows,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 );
 
 void tensor_maxpool2d_backward(
-  double* input_w,
+  const double* input_w,
   double* input_dw,
-  double* output_w,
-  double* output_dw,
-  double* x_windows,
-  double* y_windows,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const double* output_w,
+  const double* output_dw,
+  const double* x_windows,
+  const double* y_windows,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 );
 ]]
 
-local _conv2 = function(input, filter, stride, pad)
+local _conv2 = function(input, filter, stride, pad, bias)
    assert(input.w:dim() == 3 and filter.w:dim() == 3,
       'Only 3D tensors are allowed as input to symtorch.conv2d as of now.')
 
@@ -95,11 +98,27 @@ local _conv2 = function(input, filter, stride, pad)
    local out_sy = math.floor((in_sy - sy + 2 * pad) / stride + 1)
    local output = symtorch.Tensor(out_depth, out_sx, out_sy)
 
+   local use_bias = bias ~= nil
+   if use_bias then
+      if type(bias) == 'number' then
+         bias = symtorch.Tensor(out_depth):fill(bias)
+      elseif bias:isTensor() then
+         bias = symtorch.Tensor(out_depth):copy(bias)
+      elseif bias.name == 'Tensor' then
+         bias:resize(out_depth)
+      else
+         assert(false, 'Bias must be of type number | torch.Tensor | symtorch.Tensor')
+      end
+   else
+      bias = symtorch.Tensor(0)
+   end
+
    -- convolve
    libsymtorch.tensor_conv2d(
       input.w:data(),
       output.w:data(),
       filter.w:data(),
+      use_bias, bias.w:data(),
       in_depth, in_sx, in_sy,
       out_depth, out_sx, out_sy,
       sx, sy, stride, pad)
@@ -109,6 +128,7 @@ local _conv2 = function(input, filter, stride, pad)
          input.w:data(), input.dw:data(),
          output.w:data(), output.dw:data(),
          filter.w:data(), filter.dw:data(),
+         use_bias, bias.dw:data(),
          in_depth, in_sx, in_sy,
          out_depth, out_sx, out_sy,
          sx, sy, stride, pad)

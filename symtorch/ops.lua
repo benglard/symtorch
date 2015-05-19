@@ -5,23 +5,25 @@ void tensor_tanh_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 );
 
-void tensor_sigmoid(double* tensor, int size);
+void tensor_sigmoid(double* tensor, const unsigned int size);
+
 void tensor_sigmoid_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 );
 
-void tensor_relu(double* tensor, int size);
+void tensor_relu(double* tensor, const unsigned int size);
+
 void tensor_relu_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 );
 ]]
 

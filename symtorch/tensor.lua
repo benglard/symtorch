@@ -51,6 +51,11 @@ return {
          return self
       end,
 
+      resize = function(self, shape)
+         self.w:resize(shape)
+         self.dw:resize(shape)
+      end,
+
       resizeAs = function(self, other)
          self.w:resizeAs(other.w)
          self.dw:resizeAs(other.dw)
@@ -97,10 +102,10 @@ return {
                local delta = torch.Tensor(output.dw:size(1), other.w:size(1))
                delta:addr(0, 1, output.dw, other.w)
                self.dw:add(delta)
-               other.dw:addmv(0, 1, self.dw:t(), output.w)
+               other.dw:addmv(self.dw:t(), output.w)
             elseif nDim == 2 then
-               self.dw:addmm(0, 1, output.dw, other.w:t())
-               other.dw:addmm(0, 1, self.w:t(), output.dw)
+               self.dw:addmm(output.dw, other.w:t())
+               other.dw:addmm(self.w:t(), output.dw)
             elseif nDim == 3 then
                self.dw:addbmm(other.w, output.dw:transpose(2, 3))
                other.dw:addbmm(self.w:transpose(2, 3), output.dw)

@@ -1,22 +1,21 @@
 #include <math.h>
+#include <stdbool.h>
 
 void tensor_tanh_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 ) {
-  int i = 0;
   double ow = 0.0;
-  for(; i < size; i++) {
+  for(int i = 0; i < size; i++) {
     ow = output_w[i];
     input_dw[i] += (1.0 - ow * ow) * output_dw[i];
   }
 }
 
-void tensor_sigmoid(double* tensor, unsigned int size) {
-  int i = 0;
-  for(; i < size; i++) {
+void tensor_sigmoid(double* tensor, const unsigned int size) {
+  for(int i = 0; i < size; i++) {
     tensor[i] = 1.0 / (1.0 + exp(-tensor[i]));
   }
 }
@@ -25,19 +24,17 @@ void tensor_sigmoid_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 ) {
-  int i = 0;
   double ow = 0.0;
-  for(; i < size; i++) {
+  for(int i = 0; i < size; i++) {
     ow = output_w[i];
     input_dw[i] += ow * (1.0 - ow) * output_dw[i];
   }
 }
 
-void tensor_relu(double* tensor, unsigned int size) {
-  int i = 0;
-  for(; i < size; i++) {
+void tensor_relu(double* tensor, const unsigned int size) {
+  for(int i = 0; i < size; i++) {
     tensor[i] = tensor[i] > 0.0 ? tensor[i] : 0.0;
   }
 }
@@ -46,28 +43,29 @@ void tensor_relu_backward(
   double* input_dw,
   double* output_w,
   double* output_dw,
-  unsigned int size
+  const unsigned int size
 ) {
-  int i = 0;
-  for(; i < size; i++) {
+  for(int i = 0; i < size; i++) {
     input_dw[i] += output_w[i] <= 0.0 ? 0.0 : output_dw[i];
   }
 }
 
 void tensor_conv2d(
-  double* input,
+  const double* input,
   double* output,
-  double* filter,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const double* filter,
+  const bool use_bias,
+  const double* bias,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 ) {
   unsigned int d, ax, ay, fy, fx, fd, idx1, idx2;
   int x, y, off_x, off_y;
@@ -95,6 +93,7 @@ void tensor_conv2d(
             }
           }
         }
+        sum += use_bias ? bias[d] : 0.0;
         output[((out_sx * ay) + ax) * out_depth + d] = sum;
       }
     }
@@ -102,22 +101,24 @@ void tensor_conv2d(
 }
 
 void tensor_conv2d_backward(
-  double* input_w,
+  const double* input_w,
   double* input_dw,
-  double* output_w,
+  const double* output_w,
   double* output_dw,
-  double* filter_w,
+  const double* filter_w,
   double* filter_dw,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const bool use_bias,
+  double* bias_dw,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 ) {
   unsigned int d, ax, ay, fy, fx, fd, idx1, idx2;
   int x, y, off_x, off_y;
@@ -148,26 +149,30 @@ void tensor_conv2d_backward(
             }
           }
         }
+
+        if (use_bias) {
+          bias_dw[d] += grad;
+        }
       }
     }
   }
 }
 
 void tensor_maxpool2d(
-  double* input,
+  const double* input,
   double* output,
   double* x_windows,
   double* y_windows,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 ) {
   unsigned int d, ax, ay, fy, fx, fd;
   int x, y, off_x, off_y, n = 0;
@@ -211,22 +216,22 @@ void tensor_maxpool2d(
 }
 
 void tensor_maxpool2d_backward(
-  double* input_w,
+  const double* input_w,
   double* input_dw,
-  double* output_w,
-  double* output_dw,
-  double* x_windows,
-  double* y_windows,
-  unsigned int in_depth,
-  unsigned int in_sx,
-  unsigned int in_sy,
-  unsigned int out_depth,
-  unsigned int out_sx,
-  unsigned int out_sy,
-  unsigned int fsx,
-  unsigned int fsy,
-  int stride,
-  int pad
+  const double* output_w,
+  const double* output_dw,
+  const double* x_windows,
+  const double* y_windows,
+  const unsigned int in_depth,
+  const unsigned int in_sx,
+  const unsigned int in_sy,
+  const unsigned int out_depth,
+  const unsigned int out_sx,
+  const unsigned int out_sy,
+  const unsigned int fsx,
+  const unsigned int fsy,
+  const int stride,
+  const int pad
 ) {
   // pooling layers have no parameters, so simply compute
   // gradient wrt data here
