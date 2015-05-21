@@ -131,5 +131,20 @@ return {
 
          return self + safe
       end,
+
+      index = function(self, idx)
+         -- Pulls out a row as column vector
+         -- Useful for building lookup tables
+
+         local output = symtorch.Tensor()
+         output.w:copy(self[idx])
+         output.dw:resizeAs(output.w):zero()
+
+         _graph:add(function()
+            self.dw:add(output.dw[idx])
+         end)
+
+         return output
+      end,
    }
 }
