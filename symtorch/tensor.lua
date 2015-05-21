@@ -137,8 +137,9 @@ return {
          -- Useful for building lookup tables
 
          local output = symtorch.Tensor()
-         output.w:copy(self[idx])
-         output.dw:resizeAs(output.w):zero()
+         local vec = self[idx]:clone()
+         output.w:resizeAs(vec):copy(vec)
+         output.dw:resizeAs(vec):zero()
 
          _graph:add(function()
             self.dw:add(output.dw[idx])
