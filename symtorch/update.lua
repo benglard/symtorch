@@ -19,8 +19,7 @@ local _update = Class { -- rmsprop by default
             :add(torch.cmul(p.dw, p.dw):mul(1 - self.decayRate))
 
          -- clip gradients
-         p.dw[torch.gt(p.dw, self.clip)] = self.clip
-         p.dw[torch.lt(p.dw, -self.clip)] = -self.clip
+         p.dw:clamp(-self.clip, self.clip)
 
          -- update params
          s.dw
