@@ -142,7 +142,7 @@ return {
          output.dw:resizeAs(vec):zero()
 
          _graph:add(function()
-            self.dw:add(output.dw[idx])
+            self.dw[idx]:add(output.dw)
          end)
 
          return output
