@@ -174,7 +174,7 @@ void tensor_maxpool2d(
   const int stride,
   const int pad
 ) {
-  unsigned int d, ax, ay, fy, fx, fd;
+  unsigned int d, ax, ay, fy, fx;
   int x, y, off_x, off_y, n = 0;
   double win_x, win_y, act, max_act;
 
@@ -235,7 +235,7 @@ void tensor_maxpool2d_backward(
 ) {
   // pooling layers have no parameters, so simply compute
   // gradient wrt data here
-  unsigned int d, ax, ay, fy, fx, fd;
+  unsigned int d, ax, ay;
   int x, y, off_x, off_y, n = 0;
   double grad;
 
